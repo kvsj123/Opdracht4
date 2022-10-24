@@ -1,80 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Opdracht4
 {
     internal class FouteRij<T>
     {
-        Queue<T> rij_original = new Queue<T>();
-        Queue<T> rij_copy = new Queue<T>();
+        internal List<T> queue { get; set; } = new List<T>();
 
-        private T Huidig;
+        public T Huidig { get; set; }
 
-        public T Toevoegen(T iets)
+        public bool IsLeeg()
         {
-            if (rij_original.Count == 0)
-            {
-                rij_original.Enqueue(iets);
-                Huidig = iets;
-            }
-            else
-            {
-                rij_original.Enqueue(iets);
-            }
+            return queue.Count == 0;
+        }
+
+        public int Count()
+        {
+            return queue.Count;
+        }
+
+        public T HuidigElement()
+        {
             return Huidig;
         }
 
+        public T Toevoegen(T iets)
+        {
+            queue.Add(iets);
+            
+
+            if (queue.Count() == 1)
+            {
+                Huidig = iets;
+                return Huidig;
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+
+        
         public T Verwijderen()
         {
-            rij_original.Dequeue();
-            Huidig = rij_original.Peek();
+            queue.Remove(Huidig);
+            if (queue.Count > 0)
+            {
+                Huidig = queue.First();
+            }
+            else
+            {
+                Huidig = default(T);
+            }
+            
+
             return Huidig;
         }
 
         public T Volgende()
         {
-            Huidig = rij_original.Peek();
+            if (queue.Count > 0)
+            {
+                int teller = queue.IndexOf(Huidig);
+                if (teller == queue.Count() - 1)
+                {
+                    Huidig = queue[0];
+                }
+                else
+                {
+                    Huidig = queue[teller + 1];
+                }
+            }
 
             return Huidig;
-        }    
-        
+        }
+
         public void Leegmaken()
         {
-            rij_original.Clear();
-            Huidig = default(T);
+            queue.Clear();
+            Huidig = default;
+            
         }
 
         public T ZetAchteraan()
         {
-            T el = rij_original.Peek();
-            rij_original.Dequeue();
-            Huidig = rij_original.Peek();
-            rij_original.Enqueue(el);
+            T output = Huidig;
+            queue.Remove(Huidig);
+            queue.Add(output);
+            Huidig = queue[0];
 
             return Huidig;
         }
 
+
         public override string ToString()
         {
-            string showRij = "";
-
-            foreach(T iets in rij_original)
+            string output = "";
+            foreach (T iets in queue)
             {
-                showRij += iets.ToString() + "\n";
+                output += iets + ", ";
             }
-
-            return showRij;
+            return output;
         }
 
-        public Queue<T> Copy()
+        public Object Copy()
         {
-            rij_copy = rij_original;
-
-            return rij_copy;
+            return (FouteRij<T>)this.MemberwiseClone();
         }
 
     }
